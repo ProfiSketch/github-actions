@@ -1,0 +1,28 @@
+name: QA phase 🧪
+
+on:
+  pull_request:
+    branches: dev
+    types: closed
+
+jobs:
+  build:
+    if: github.event.pull_request.merged == true
+    uses: ./.github/workflows/_build.yml
+    # Uncomment if branches are protected
+    # with:
+    #   skip-linting: true
+
+  create_pull_request:
+    needs: build
+    if: success()
+    uses: ./.github/workflows/_pull_request.yml
+    with:
+      from_branch: dev
+      to_branch: prod
+      # TODO: set proper version
+      version: '0.0.0'
+      team-reviewers: [team-qa]
+    permissions:
+      pull-requests: write
+

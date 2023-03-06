@@ -1,0 +1,20 @@
+name: Development phase 🏗️
+
+# 📣 You can specify what teams should be asked for review below
+
+on:
+  pull_request_target:
+    branches: dev
+
+jobs:
+  build:
+    uses: ./.github/workflows/_build.yml
+
+  review_request:
+    needs: build
+    if: success()
+    uses: ./.github/workflows/_auto_review.yml
+    secrets: inherit
+    permissions:
+      contents: read
+      pull-requests: write

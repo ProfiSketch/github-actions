@@ -1,0 +1,31 @@
+name: ⚙️ Create pull request
+
+on:
+  workflow_call:
+    inputs:
+      from_branch:
+        required: true
+        type: string
+      to_branch:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      team-reviewers:
+        required: false
+
+jobs:
+  create_pull_request:
+    name: Create pull request
+    runs-on: ubuntu-latest
+    steps:
+      - uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: Updating `${{ inputs.to_branch }}` to v${{ inputs.version }}
+          branch: ${{ inputs.from_branch }}
+          base: ${{ inputs.to_branch }}
+          team-reviewers: ${{ inputs.team-reviewers }}
+          # TODO: add assignees
+          # assignees:

@@ -1,0 +1,28 @@
+name: ⚙️ Merge
+
+on:
+  workflow_call:
+    inputs:
+      title:
+        type: string
+        required: true
+      pr_head_ref:
+        type: string
+        required: true
+      target_branch:
+        type: string
+        required: true
+
+jobs:
+  merge:
+    name: Merge into `${{ inputs.target_branch }}` branch
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Merge and push
+        run: |
+          git config --global user.email "dev@profisketch.com"
+          git config --global user.name "ProfiSketch"
+          git merge --no-ff ${{ inputs.pr_head_ref }} -m "Merge pull request ${{ inputs.title }} - ${GITHUB_SHA}"
+          git push origin ${{ inputs.target_branch }}

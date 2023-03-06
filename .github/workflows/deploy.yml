@@ -1,0 +1,38 @@
+name: Deploy 🎉
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  reviews_approval:
+    if: github.event.pull_request.base.ref == 'prod'
+    uses: ./.github/workflows/_reviews_approval.yml
+    permissions:
+      pull-requests: read
+
+  bump_release:
+    # TODO: Push to dev and to prod branches
+    name: Bump new release version
+    needs: reviews_approval
+    if: success()
+    uses: ./.github/workflows/_bump.yml
+    with:
+      args: --release-as patch
+
+  build:
+    needs: bump_release
+    if: success()
+    uses: ./.github/workflows/_build.yml
+    # Uncomment if branches are protected
+    # with:
+    #   skip-linting: true
+
+  notifications:
+    needs: build
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send a Telegram notification
+        # TODO: implement real bot notifications
+        run: echo "🎉 New app version released!"

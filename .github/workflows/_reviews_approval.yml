@@ -1,0 +1,20 @@
+name: ⚙️ Check reviews approval
+
+on:
+  workflow_call:
+
+jobs:
+  reviews_approval:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if all reviews are approved
+        run: |
+          if curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
+          | jq -e '.[] | select(.state == "PENDING") | .state' > /dev/null
+          then
+              echo "There are pending reviews"
+              exit 1
+          else
+              echo "All reviews are approved"
+          fi

@@ -1,0 +1,29 @@
+name: Review phase 🔎
+
+on:
+  pull_request_review:
+    types: [submitted]
+
+jobs:
+  reviews_approval:
+    if: github.event.pull_request.base.ref == 'dev'
+    uses: ./.github/workflows/_reviews_approval.yml
+    permissions:
+      pull-requests: read
+
+  merge_to_dev:
+    needs: reviews_approval
+    if: success()
+    uses: ./.github/workflows/_merge.yml
+    with:
+      title: '#${{ github.event.pull_request.number }}'
+      pr_head_ref: '${{ github.event.pull_request.head.ref }}'
+      target_branch: dev
+
+  bump_prerelease:
+    name: Bump new prerelease version
+    needs: merge_to_dev
+    if: success()
+    uses: ./.github/workflows/_bump.yml
+    with:
+      args: --prerelease

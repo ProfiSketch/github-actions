@@ -1,0 +1,38 @@
+name: Release 🔖
+
+on:
+  pull_request:
+    branches: main
+    types: closed
+
+# Make sure that there is only one active publish workflow running on same time
+concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  build_and_publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.13
+          registry-url: ${{ secrets.NPM_REGISTRY_URL }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      # - name: Configure npm registry (.yarnrc)
+      #   run: |
+      #     cat << EOF > "./.yarnrc"
+      #       //registry.npmjs.org/:_authToken=$NPM_TOKEN
+      #     EOF
+      #   env:
+      #     NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Publish
+        run: echo "Publishing!"

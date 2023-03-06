@@ -1,0 +1,17 @@
+name: ⚙️ Request a review
+
+on:
+  workflow_call:
+
+jobs:
+  add-reviews:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: octokit/request-action@v2.1.7
+        id: request_review
+        with:
+          route: POST /repos/repository-owner-name/${{ github.event.repository.name }}/pulls/${{ github.event.pull_request.number  }}/requested_reviewers
+          team_reviewers: '["teamA"]'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_BOT_TOKEN }} // use PAT instead of GITHUB_TOKEN
+      - run: "echo 'latest release: ${{ steps.request_review.outputs.data }}'"
