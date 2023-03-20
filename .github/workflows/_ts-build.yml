@@ -1,4 +1,7 @@
-name: ⚙️ Build
+name: ⚙️ Lint, test and build TypeScript app
+
+# 🚨 `lint` and `test` commands must be specified in `package.json` file
+# `npm` is used as a package system (for ci-cd purposes)
 
 on:
   workflow_call:
@@ -23,15 +26,15 @@ jobs:
           node-version: 16.13
 
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: npm ci
 
       - name: Code linting
         if: ${{ !inputs.skip-linting }}
-        run: yarn lint
+        run: npm run lint
 
       - name: Run tests
         if: ${{ !inputs.skip-testing }}
-        run: yarn lint
+        run: npm test
 
       - name: Build
-        run: yarn build
+        run: npm run build
